@@ -19,13 +19,13 @@ void cmd_vel_received(const geometry_msgs::Twist::ConstPtr& cmd_vel)
             linear_speed > -std::numeric_limits<double>::epsilon() ) {
         // zero linear speed - turn in place
         double speed = angular_speed;
-        //move_robot_2WD(speed, -speed);
+        move_robot_2WD(speed, -speed);
     }
     else if( angular_speed <  std::numeric_limits<double>::epsilon() &&
              angular_speed > -std::numeric_limits<double>::epsilon() ) {
         // zero angular speed - pure forward/backward motion
         double speed = linear_speed;
-        //move_robot_2WD(speed, speed);
+        move_robot_2WD(speed, speed);
     }
     else {
         // Rotation about a point in space
