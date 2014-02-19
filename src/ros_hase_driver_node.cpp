@@ -42,6 +42,9 @@ int main(int argc, char **argv)
 	ros::NodeHandle n;
 	ros::Subscriber sub = n.subscribe("cmd_vel", 10, cmd_vel_received);
 
+	robot.init();
+	robot.enable();
+
 	while (ros::ok()) {
 		ros::spin();
 	}
