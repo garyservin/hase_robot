@@ -103,7 +103,7 @@ include_directories(
 # add_library(ros_hase_driver
 #   src/${PROJECT_NAME}/ros_hase_driver.cpp
 # )
-add_library(hase STATIC src/hase/SimpleGPIO.cpp src/hase/SimplePWM.cpp src/hase/MoveRobot.cpp)
+add_library(hase STATIC src/hase/SimpleGPIO.cpp src/hase/SimplePWM.cpp src/hase/Hase.cpp)
 
 add_executable(ros_hase_driver_node src/ros_hase_driver_node.cpp)
 add_dependencies(ros_hase_driver_node hase)
