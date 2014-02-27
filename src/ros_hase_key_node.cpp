@@ -4,11 +4,15 @@
 #include <termios.h>
 #include <stdio.h>
 
-#define KEYCODE_R 0x43
-#define KEYCODE_L 0x44
-#define KEYCODE_U 0x41
-#define KEYCODE_D 0x42
-#define KEYCODE_Q 0x71
+#define KEYCODE_RIGHT 0x43
+#define KEYCODE_LEFT  0x44
+#define KEYCODE_UP    0x41
+#define KEYCODE_DOWN  0x42
+#define KEYCODE_E     0x65
+#define KEYCODE_D     0x64
+#define KEYCODE_SPACE 0x20
+#define KEYCODE_PLUS  0x2B
+#define KEYCODE_MINUS 0x2D
 
 class TeleopHase
 {
@@ -18,14 +22,17 @@ public:
 private:
   ros::NodeHandle nh_;
   double linear_, angular_, l_scale_, a_scale_;
+  double linear_max, angular_max;
   ros::Publisher twist_pub_;
 };
 
 TeleopHase::TeleopHase():
-  linear_(0),
-  angular_(0),
-  l_scale_(0.7),
-  a_scale_(0.7)
+  linear_(0.3),
+  angular_(0.3),
+  linear_max(1.0),
+  angular_max(1.0),
+  l_scale_(1.0),
+  a_scale_(1.0)
 {
   nh_.param("scale_angular", a_scale_, a_scale_);
   nh_.param("scale_linear", l_scale_, l_scale_);
@@ -61,7 +68,6 @@ void TeleopHase::keyLoop()
   char c;
   bool dirty=false;
 
-
   // get the console in raw mode
   tcgetattr(kfd, &cooked);
   memcpy(&raw, &cooked, sizeof(struct termios));
@@ -85,33 +91,71 @@ void TeleopHase::keyLoop()
       exit(-1);
     }
 
-    linear_=angular_=0;
+    //linear_ = angular_ = 0;
+    // Add a temporary variable to hold linear velocity
+
     ROS_DEBUG("value: 0x%02X\n", c);
 
     switch(c)
     {
-      case KEYCODE_L:
+      case KEYCODE_LEFT:
         ROS_DEBUG("LEFT");
-        angular_ = 1.0;
+        if (angular_ < 0.0)
+            angular_ = -angular_;
+        linear_ = 0.0;
+        angular_ = 0.6;//angular_;
         dirty = true;
         break;
-      case KEYCODE_R:
+      case KEYCODE_RIGHT:
         ROS_DEBUG("RIGHT");
-        angular_ = -1.0;
+        if (angular_ < 0.0)
+            angular_ = -angular_;
+        linear_ = 0.0;
+        angular_ = -0.6;//-angular_;
         dirty = true;
         break;
-      case KEYCODE_U:
+      case KEYCODE_UP:
         ROS_DEBUG("UP");
-        linear_ = 1.0;
+        if (linear_ < 0.0)
+            linear_ = -linear_;
+        linear_ = linear_;
+        angular_ = 0.0;
+        dirty = true;
+        break;
+      case KEYCODE_DOWN:
+        ROS_DEBUG("DOWN");
+        if (linear_ < 0.0)
+            linear_ = -linear_;
+        linear_ = -linear_;
+        angular_ = 0.0;
+        dirty = true;
+        break;
+      case KEYCODE_E:
+        ROS_DEBUG("ENABLE");
+        linear_ = 0.0;
+        angular_ = 0.0;
         dirty = true;
         break;
       case KEYCODE_D:
-        ROS_DEBUG("DOWN");
-        linear_ = -1.0;
+        ROS_DEBUG("DISABLE");
+        linear_ = 0.0;
+        angular_ = 0.0;
         dirty = true;
         break;
-      case KEYCODE_Q:
-        ROS_DEBUG("STOP");
+      case KEYCODE_PLUS:
+        ROS_DEBUG("PLUS");
+        if(linear_ < linear_max)
+        {
+          linear_ += 0.1;
+        }
+        dirty = true;
+        break;
+      case KEYCODE_MINUS:
+        ROS_DEBUG("MINUS");
+        if(linear_ > -linear_max)
+        {
+          linear_ -= 0.1;
+        }
         dirty = true;
         break;
     }
