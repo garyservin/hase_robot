@@ -1,8 +1,8 @@
-#ifndef _HASE_H_
-#define _HASE_H_
+#ifndef _HASE_HPP_
+#define _HASE_HPP_
 
-#include "SimpleGPIO.h"
-#include "SimplePWM.h"
+#include "SimpleGPIO.hpp"
+#include "SimplePWM.hpp"
 
 #define R_FWD   69   // GPIO1_13 = (1x32) + 13 = 45
 #define R_REV   45   // GPIO2_5  = (2x32) +  5 = 69
@@ -27,4 +27,4 @@ namespace hase {
 		bool is_enabled;
 	};
 }; // namespace hase
-#endif /* _HASE_H_ */
+#endif /* _HASE_HPP_ */

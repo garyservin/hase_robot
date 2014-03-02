@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>hase_driver</name>
+  <version>0.0.0</version>
+  <description>
+    C++ driver library for Hase:
+  </description>
+
+  <author email="garyservin@gmail.com">Gary Servin</author>
+  <maintainer email="garyservin@gmail.com">Gary Servin</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>

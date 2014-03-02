@@ -34,7 +34,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "SimpleGPIO.h"
+#include "../../include/hase_driver/SimpleGPIO.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

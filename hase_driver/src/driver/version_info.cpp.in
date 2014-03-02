@@ -1,0 +1,11 @@
+#include "hase_driver/version_info.hpp"
+
+namespace hase
+{
+
+std::string VersionInfo::getSoftwareVersion()
+{
+  return std::string("@hase_driver_VERSION@");
+}
+
+} //namespace hase
