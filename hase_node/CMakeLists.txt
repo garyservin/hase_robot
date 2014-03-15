@@ -3,13 +3,14 @@ project(hase_node)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  geometry_msgs std_msgs
+  geometry_msgs
+  std_msgs
   hase_driver
 )
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES hase_ros hase_node
+  LIBRARIES hase_ros
   CATKIN_DEPENDS geometry_msgs std_msgs hase_driver
 )
 

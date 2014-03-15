@@ -1,21 +1,11 @@
 <?xml version="1.0"?>
 <robot name="hase" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:include filename="$(find hase_description)/urdf/common_properties.urdf.xacro"/>
+  <xacro:include filename="$(find hase_description)/urdf/hase_gazebo.urdf.xacro"/>
 
   <!-- Hase -->
   <xacro:macro name="hase">
     <link name="base_footprint"/>
-    <!--
-       Base link is set at the bottom of the base mould.
-       This is done to be compatible with the way base link
-       was configured for turtlebot 1. Refer to
-
-       https://github.com/turtlebot/turtlebot/issues/40
-
-       To put the base link at the more oft used wheel
-       axis, set the z-distance from the base_footprint
-       to 0.352.
-      -->
     <joint name="base_joint" type="fixed">
       <origin xyz="0 0 0.0435" rpy="0 0 0" />
       <parent link="base_footprint"/>
@@ -24,9 +14,8 @@
     <link name="base_link">
       <visual>
         <geometry>
-          <cylinder length="0.005" radius="0.175"/>
+          <mesh filename="package://hase_description/meshes/base.dae" scale=".001 .001 .001"/>
         </geometry>
-        <xacro:insert_block name="material_light_grey"/>
         <origin xyz="0.00 0 0.0" rpy="0 0 0"/>
       </visual>
       <collision>
@@ -38,7 +27,7 @@
         <!-- COM experimentally determined -->
         <origin xyz="0.01 0 0"/>
         <mass value="2.4"/> <!-- 2.4/2.6 kg for small/big battery pack -->
-        <!-- Kobuki's inertia tensor is approximated by a cylinder with homogeneous mass distribution
+        <!-- Hase's inertia tensor is approximated by a cylinder with homogeneous mass distribution
              More details: http://en.wikipedia.org/wiki/List_of_moment_of_inertia_tensors
              m = 2.4 kg; h = 0.09 m; r = 0.175 m
              ixx = 1/12 * m * (3 * r^2 + h^2)
@@ -60,9 +49,8 @@
     <link name="wheel_left_link">
       <visual>
         <geometry>
-          <cylinder length="0.0206" radius="0.0619125"/>
+          <mesh filename="package://hase_description/meshes/wheel.dae" scale=".001 .001 .001"/>
         </geometry>
-        <xacro:insert_block name="material_dark_grey"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
       </visual>
       <collision>
@@ -89,9 +77,8 @@
     <link name="wheel_right_link">
       <visual>
         <geometry>
-          <cylinder length="0.0206" radius="0.0619125"/>
+          <mesh filename="package://hase_description/meshes/wheel.dae" scale=".001 .001 .001"/>
         </geometry>
-        <xacro:insert_block name="material_dark_grey"/>
         <origin xyz="0 0 0" rpy="0 0 0"/>
       </visual>
       <collision>
@@ -108,6 +95,65 @@
                  izz="0.001" />
       </inertial>
     </link>
+
+    <joint name="caster_front_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="caster_front_link"/>
+      <origin xyz="0.135 0.0 -0.021" rpy="${-M_PI/2} 0 0"/>
+    </joint>
+    <link name="caster_front_link">
+      <visual>
+        <geometry>
+          <cylinder length="0.0176" radius="0.0225"/>
+        </geometry>
+        <xacro:insert_block name="material_dark_grey"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.0176" radius="0.0225"/>
+        </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+      </collision>
+      <inertial>
+        <mass value="0.01" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                 iyy="0.001" iyz="0.0"
+                 izz="0.001" />
+      </inertial>
+    </link>
+
+    <joint name="caster_back_joint" type="fixed">
+      <parent link="base_link"/>
+      <child link="caster_back_link"/>
+      <origin xyz="-0.135 0.0 -0.021" rpy="${-M_PI/2} 0 0"/>
+    </joint>
+    <link name="caster_back_link">
+      <visual>
+        <geometry>
+          <cylinder length="0.0176" radius="0.0225"/>
+        </geometry>
+        <xacro:insert_block name="material_dark_grey"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.0176" radius="0.0225"/>
+        </geometry>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+      </collision>
+      <inertial>
+        <mass value="0.01" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
+                 iyy="0.001" iyz="0.0"
+                 izz="0.001" />
+      </inertial>
+    </link>
+
+    <!-- Hase Gazebo simulation details -->
+    <hase_sim/>
 
   </xacro:macro>
 </robot>
