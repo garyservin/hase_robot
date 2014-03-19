@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<robot name="hase_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="hase_sim">
+    <gazebo reference="wheel_left_link">
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+      <kp>100000000.0</kp>
+      <kd>10000.0</kd>
+    </gazebo>
+
+    <gazebo reference="wheel_right_link">
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+      <kp>100000000.0</kp>
+      <kd>10000.0</kd>
+    </gazebo>
+
+    <gazebo reference="caster_front_link">
+      <mu1>0.0</mu1>
+      <mu2>0.0</mu2>
+      <kp>100000000.0</kp>
+      <kd>10000.0</kd>
+    </gazebo>
+
+    <gazebo reference="caster_back_link">
+      <mu1>0.0</mu1>
+      <mu2>0.0</mu2>
+      <kp>100000000.0</kp>
+      <kd>10000.0</kd>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="hase_controller" filename="libgazebo_ros_hase.so">
+       <publish_tf>1</publish_tf>
+        <left_wheel_joint_name>wheel_left_joint</left_wheel_joint_name>
+        <right_wheel_joint_name>wheel_right_joint</right_wheel_joint_name>
+        <wheel_separation>0.230</wheel_separation>
+        <wheel_diameter>0.123825</wheel_diameter>
+        <torque>1.0</torque>
+        <velocity_command_timeout>0.6</velocity_command_timeout>
+        <imu_name>imu</imu_name>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+</robot>
