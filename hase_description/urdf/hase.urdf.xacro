@@ -7,7 +7,7 @@
   <xacro:macro name="hase">
     <link name="base_footprint"/>
     <joint name="base_joint" type="fixed">
-      <origin xyz="0 0 0.0435" rpy="0 0 0" />
+      <origin xyz="0 0 0.0402" rpy="0 0 0" />
       <parent link="base_footprint"/>
       <child link="base_link" />
     </joint>
@@ -16,16 +16,17 @@
         <geometry>
           <mesh filename="package://hase_description/meshes/base.dae" scale=".001 .001 .001"/>
         </geometry>
-        <origin xyz="0.00 0 0.0" rpy="0 0 ${M_PI/2}"/>
+        <origin xyz="0 0 0.0548" rpy="0 0 0"/>
       </visual>
       <collision>
         <geometry>
-          <cylinder length="0.10938" radius="0.178"/>
+          <cylinder length="0.1" radius="0.178"/>
         </geometry>
+        <origin xyz="0.0 0 0.0548" rpy="0 0 0"/>
       </collision>
       <inertial>
         <!-- COM experimentally determined -->
-        <origin xyz="0.01 0 0"/>
+        <origin xyz="0 0 0"/>
         <mass value="2.4"/> <!-- 2.4/2.6 kg for small/big battery pack -->
         <!-- Hase's inertia tensor is approximated by a cylinder with homogeneous mass distribution
              More details: http://en.wikipedia.org/wiki/List_of_moment_of_inertia_tensors
@@ -43,7 +44,7 @@
     <joint name="wheel_left_joint" type="continuous">
       <parent link="base_link"/>
       <child link="wheel_left_link"/>
-      <origin xyz="0.00 ${0.23/2} 0.0184" rpy="${-M_PI/2} 0 0"/>
+      <origin xyz="0.00 ${0.23/2} 0.0213" rpy="${-M_PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
     </joint>
     <link name="wheel_left_link">
@@ -55,12 +56,12 @@
       </visual>
       <collision>
         <geometry>
-          <cylinder length="0.0206" radius="0.0619125"/>
+          <cylinder length="0.0205" radius="0.0615"/>
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
       <inertial>
-        <mass value="0.01" />
+        <mass value="0.1" />
         <origin xyz="0 0 0" />
         <inertia ixx="0.001" ixy="0.0" ixz="0.0"
                  iyy="0.001" iyz="0.0"
@@ -71,7 +72,7 @@
     <joint name="wheel_right_joint" type="continuous">
       <parent link="base_link"/>
       <child link="wheel_right_link"/>
-      <origin xyz="0.00 -${0.23/2} 0.0184" rpy="${-M_PI/2} 0 0"/>
+      <origin xyz="0.00 -${0.23/2} 0.0213" rpy="${-M_PI/2} 0 0"/>
       <axis xyz="0 0 1"/>
     </joint>
     <link name="wheel_right_link">
@@ -83,12 +84,12 @@
       </visual>
       <collision>
         <geometry>
-          <cylinder length="0.0206" radius="0.0619125"/>
+          <cylinder length="0.0205" radius="0.0615"/>
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
       <inertial>
-        <mass value="0.01" />
+        <mass value="0.1" />
         <origin xyz="0 0 0" />
         <inertia ixx="0.001" ixy="0.0" ixz="0.0"
                  iyy="0.001" iyz="0.0"
@@ -99,19 +100,12 @@
     <joint name="caster_front_joint" type="fixed">
       <parent link="base_link"/>
       <child link="caster_front_link"/>
-      <origin xyz="0.135 0.0 -0.021" rpy="${-M_PI/2} 0 0"/>
+      <origin xyz="0.115 0.0 0.015" rpy="${-M_PI/2} 0 0"/>
     </joint>
     <link name="caster_front_link">
-      <visual>
-        <geometry>
-          <cylinder length="0.0176" radius="0.0225"/>
-        </geometry>
-        <xacro:insert_block name="material_dark_grey"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-      </visual>
       <collision>
         <geometry>
-          <cylinder length="0.0176" radius="0.0225"/>
+          <cylinder length="0.015" radius="0.055"/>
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
@@ -127,19 +121,12 @@
     <joint name="caster_back_joint" type="fixed">
       <parent link="base_link"/>
       <child link="caster_back_link"/>
-      <origin xyz="-0.135 0.0 -0.021" rpy="${-M_PI/2} 0 0"/>
+      <origin xyz="-0.115 0.0 0.015" rpy="${-M_PI/2} 0 0"/>
     </joint>
     <link name="caster_back_link">
-      <visual>
-        <geometry>
-          <cylinder length="0.0176" radius="0.0225"/>
-        </geometry>
-        <xacro:insert_block name="material_dark_grey"/>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-      </visual>
       <collision>
         <geometry>
-          <cylinder length="0.0176" radius="0.0225"/>
+          <cylinder length="0.015" radius="0.055"/>
         </geometry>
         <origin rpy="0 0 0" xyz="0 0 0"/>
       </collision>
