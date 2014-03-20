@@ -6,7 +6,7 @@
     <arg name="debug" value="false"/>
     <arg name="world_name" value="$(find hase_gazebo)/worlds/playground.world"/>
   </include>
-  
+
   <!-- spawn the robot -->
   <include file="$(find hase_gazebo)/launch/includes/robot.launch.xml"/>
 </launch>

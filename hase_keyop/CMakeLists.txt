@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 catkin_package(
-  INCLUDE_DIRS include
+  INCLUDE_DIRS
   LIBRARIES hase
   CATKIN_DEPENDS geometry_msgs std_msgs roscpp rospy
 )

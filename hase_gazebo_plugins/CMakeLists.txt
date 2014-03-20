@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(hase_gazebo_plugins)
 
 # Find gazebo
-include(FindPkgConfig)
+find_package(PkgConfig)
 if (PKG_CONFIG_FOUND)
   pkg_check_modules(GAZEBO gazebo)
 endif()
@@ -21,7 +21,8 @@ catkin_package(
   LIBRARIES gazebo_ros_hase
   CATKIN_DEPENDS gazebo_ros
                  geometry_msgs
-                 nav_msgs roscpp
+                 nav_msgs
+                 roscpp
                  sensor_msgs
                  std_msgs
                  tf
