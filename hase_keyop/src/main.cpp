@@ -103,7 +103,7 @@ void TeleopHase::keyLoop()
         if (angular_ < 0.0)
             angular_ = -angular_;
         linear_ = 0.0;
-        angular_ = 0.6;//angular_;
+        angular_ = 0.3;
         dirty = true;
         break;
       case KEYCODE_RIGHT:
@@ -111,11 +111,13 @@ void TeleopHase::keyLoop()
         if (angular_ < 0.0)
             angular_ = -angular_;
         linear_ = 0.0;
-        angular_ = -0.6;//-angular_;
+        angular_ = -0.3;
         dirty = true;
         break;
       case KEYCODE_UP:
         ROS_DEBUG("UP");
+        if(angular_ != 0.0)
+            linear_ = 0.3;
         if (linear_ < 0.0)
             linear_ = -linear_;
         linear_ = linear_;
@@ -124,6 +126,8 @@ void TeleopHase::keyLoop()
         break;
       case KEYCODE_DOWN:
         ROS_DEBUG("DOWN");
+        if(angular_ != 0.0)
+            linear_ = 0.3;
         if (linear_ < 0.0)
             linear_ = -linear_;
         linear_ = -linear_;
