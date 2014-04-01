@@ -110,7 +110,6 @@ void GazeboRosHase::Load(physics::ModelPtr parent, sdf::ElementPtr sdf)
   }
   joints_[LEFT] = parent->GetJoint(left_wheel_joint_name_);
   joints_[RIGHT] = parent->GetJoint(right_wheel_joint_name_);
-  ROS_INFO_STREAM("Left Joint " << joints_[LEFT]);
 
   if (!joints_[LEFT] || !joints_[RIGHT])
   {
