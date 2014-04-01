@@ -203,7 +203,7 @@ void GazeboRosHase::Load(physics::ModelPtr parent, sdf::ElementPtr sdf)
   cmd_vel_sub_ = nh_priv_.subscribe("commands/velocity", 100, &GazeboRosHase::cmdVelCB, this);
 
   prev_update_time_ = world_->GetSimTime();
-  ROS_INFO_STREAM("GazeboRosKobuki plugin ready to go! [" << node_name_ << "]");
+  ROS_INFO_STREAM("GazeboRosHase plugin ready to go! [" << node_name_ << "]");
   update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboRosHase::OnUpdate, this));
 }
 
