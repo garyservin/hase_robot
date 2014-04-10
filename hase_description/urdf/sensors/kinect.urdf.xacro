@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <robot name="sensor_kinect" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_gazebo.urdf.xacro"/>
-  <xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_properties.urdf.xacro"/>
+  <xacro:include filename="$(find hase_description)/urdf/hase_gazebo.urdf.xacro"/>
+<!--  <xacro:include filename="$(find hase_description)/urdf/hase_properties.urdf.xacro"/>-->
   
-  <!-- Parameterised in part by the values in turtlebot_properties.urdf.xacro -->
+  <!-- Parameterised in part by the values in hase_properties.urdf.xacro -->
   <xacro:macro name="sensor_kinect" params="parent">
     <joint name="camera_rgb_joint" type="fixed">
       <origin xyz="${cam_px} ${cam_py} ${cam_pz}" rpy="${cam_or} ${cam_op} ${cam_oy}"/>
@@ -43,7 +43,7 @@
     <visual>
      <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
       <geometry>
-       <mesh filename="package://turtlebot_description/meshes/sensors/kinect.dae"/>
+       <mesh filename="package://hase_description/meshes/sensors/kinect.dae"/>
       </geometry>
     </visual>
 	  <collision>
@@ -94,6 +94,6 @@
 	</link>
 	
 	<!-- Kinect sensor for simulation -->
-	<turtlebot_sim_3dsensor/>
+	<hase_sim_3dsensor/>
   </xacro:macro>
 </robot>
