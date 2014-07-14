@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+    - Base      : hase
+    - Stacks    : hexagons
+    - 3d Sensor : kinect
+-->
+<robot name="hase"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find hase_description)/urdf/hase.urdf.xacro" />
+  <xacro:include filename="$(find hase_description)/urdf/sensors/kinect.urdf.xacro"/>
+
+  <property name="cam_px" value="-0.087" />
+  <property name="cam_py" value="-0.0125" />
+  <property name="cam_pz" value="0.1560" />
+  <property name="cam_or" value="0" />
+  <property name="cam_op" value="0" />
+  <property name="cam_oy" value="0" />
+
+  <hase/>
+  <sensor_kinect  parent="base_link"/>
+</robot>
+

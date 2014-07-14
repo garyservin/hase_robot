@@ -17,4 +17,5 @@
   <run_depend>hase_description</run_depend>
   <run_depend>hase_gazebo_plugins</run_depend>
   <run_depend>robot_state_publisher</run_depend>
+  <run_depend>depthimage_to_laserscan</run_depend>
 </package>
