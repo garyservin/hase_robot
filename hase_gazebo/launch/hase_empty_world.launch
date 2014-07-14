@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <!-- Launches Hase Gazebo simulation in an empty world -->
 <launch>
   <!-- start Gazebo with an empty world -->

@@ -7,7 +7,9 @@
 
   <param name="robot_description"
         command="$(find xacro)/xacro.py '$(find hase_description)/urdf/hase_kinect.urdf.xacro'"/>
-        <!--command="$(find xacro)/xacro.py '$(find hase_description)/urdf/hase_standalone.urdf.xacro'"/>-->
+        <!--
+        command="$(find xacro)/xacro.py '$(find hase_description)/urdf/hase_standalone.urdf.xacro'"/>
+        -->
 
   <!-- Gazebo model spawner -->
   <node pkg="gazebo_ros" type="spawn_model" name="spawn_$(arg robot_name)"
