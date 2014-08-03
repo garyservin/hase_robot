@@ -17,7 +17,7 @@ HaseRos::HaseRos()
  */
 HaseRos::~HaseRos()
 {
-  ROS_INFO_STREAM("Hase : waiting for kobuki thread to finish.");
+  ROS_INFO_STREAM("Hase : waiting for hase thread to finish.");
 }
 
 bool HaseRos::init(ros::NodeHandle& nh)
@@ -37,7 +37,7 @@ bool HaseRos::init(ros::NodeHandle& nh)
  */
 void HaseRos::subscribeTopics(ros::NodeHandle& nh)
 {
-  velocity_command_subscriber = nh.subscribe(std::string("commands/velocity"), 10, &HaseRos::subscribeVelocityCommand, this);
+  velocity_command_subscriber = nh.subscribe(std::string("cmd_vel"), 10, &HaseRos::subscribeVelocityCommand, this);
 }
 
 

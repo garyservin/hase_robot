@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Joy node -->
+  <param name="joy_node/dev" value="/dev/input/js1"/>
+  <node pkg="joy" type="joy_node" name="joy_node" />
+
+  <!-- Teleop node -->
+  <node pkg="hase_keyop" type="hase_joy_teleop" name="hase_teleop">
+    <remap from="cmd_vel" to="mobile_base/cmd_vel"/>
+  </node>
+</launch>

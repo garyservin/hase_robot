@@ -199,7 +199,7 @@ void GazeboRosHase::Load(physics::ModelPtr parent, sdf::ElementPtr sdf)
     return;
   }
   last_cmd_vel_time_ = world_->GetSimTime();
-  cmd_vel_sub_ = nh_priv_.subscribe("commands/velocity", 100, &GazeboRosHase::cmdVelCB, this);
+  cmd_vel_sub_ = nh_priv_.subscribe("cmd_vel", 100, &GazeboRosHase::cmdVelCB, this);
 
   prev_update_time_ = world_->GetSimTime();
   ROS_INFO_STREAM("GazeboRosHase plugin ready to go! [" << node_name_ << "]");

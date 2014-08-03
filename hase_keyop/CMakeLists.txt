@@ -4,6 +4,7 @@ project(hase_keyop)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   std_msgs
+  joy
   roscpp
   rospy
 )
