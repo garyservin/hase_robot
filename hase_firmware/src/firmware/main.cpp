@@ -2,11 +2,7 @@
 #include <Hase.h>
 #include <ros.h>
 #include <ros/time.h>
-#include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Quaternion.h>
-#include <std_msgs/UInt32.h>
-#include <tf/transform_broadcaster.h>
-#include <OdometryLite.h>
+#include <geometry_msgs/TwistStamped.h>
 
 #define BT_TX   p28
 #define BT_RX   p27
@@ -24,34 +20,21 @@ Serial pc ( USBTX, USBRX ); // Serial Comm to PC
 Serial bt ( BT_TX, BT_RX ); // Serial Comm to PC/Control via Bluetooth
 
 Hase robot;
-Ticker info;
+Ticker led;
+Ticker twist;
 
-unsigned char moving = 0; // is the base in motion?
-
-/* The base and odometry frames */
+// The base frame
 char baseFrame[] = "/base_link";
-char odomFrame[] = "/odom";
 
-/* SetPointInfo struct is defined in PIDTypes.h */
-Hase::SetPointInfo leftPID, rightPID;
-
-/* OdomInfo struct is defined in PIDTypes.h */
-Hase::OdomInfo odomInfo;
-
-/* Create the ROS node handle */
+// Create the ROS node handle
 ros::NodeHandle nh;
 
-/* A publisher for OdometryLite data on the /odometry_lite topic. */
-hase_firmware::OdometryLite odom_msg;
-ros::Publisher odomPub("/hase/odom", &odom_msg);
+// A publisher for TwistStamped data on the /hase/twist topic.
+geometry_msgs::TwistStamped twist_msg;
+ros::Publisher twistPub("/hase/twist_lite", &twist_msg);
 
-/* A debugging publisher since nh.loginfo() only takes character constants */
-//std_msgs::UInt32 log_msg;
-//ros::Publisher logPub("hase/log", &log_msg);
-
-void infoInt(){
-    pc.printf("%3.f\t", robot.getRPM(Hase::LEFT_WHEEL));
-    pc.printf("%3.f\t", robot.getRPM(Hase::LEFT_WHEEL));
+void ledInt(){
+    led1 = !led1;
 }
 
 void cmdVelCb(const geometry_msgs::Twist& msg){
@@ -61,17 +44,17 @@ void cmdVelCb(const geometry_msgs::Twist& msg){
 
     bt.printf("Linear=%.2f, Angular=%.2f\r\n", x, th);
 
-    /* Reset the auto stop timer */
+    // Reset the auto stop timer
     //lastMotorCommand = millis();
 
     if (x == 0 && th == 0) {
-        moving = 0;
+        //moving = 0;
         robot.setSpeeds(0, 0);
         return;
     }
 
-    /* Indicate that we are moving */
-    moving = 1;
+    // Indicate that we are moving
+    //moving = 1;
 
     if (x == 0) {
         // Turn in place
@@ -89,113 +72,70 @@ void cmdVelCb(const geometry_msgs::Twist& msg){
     }
 
     bt.printf("Left=%.2f, Right=%.2f\r\n", spd_left, spd_right);
-    /* Set the target speeds in meters per second */
-    leftPID.TargetSpeed = spd_left;
-    rightPID.TargetSpeed = spd_right;
+    // Set the target speeds in meters per second
+    //leftPID.TargetSpeed = spd_left;
+    //rightPID.TargetSpeed = spd_right;
 
-    /* Convert speeds to encoder ticks per frame */
-    leftPID.TargetTicksPerFrame = robot.speedToTicks(leftPID.TargetSpeed);
-    rightPID.TargetTicksPerFrame = robot.peedToTicks(rightPID.TargetSpeed);
+    // Convert speeds to encoder ticks per frame
+    //leftPID.TargetTicksPerFrame = robot.speedToTicks(leftPID.TargetSpeed);
+    //rightPID.TargetTicksPerFrame = robot.speedToTicks(rightPID.TargetSpeed);
 
-    robot.setSpeeds(leftPID.TargetTicksPerFrame, rightPID.TargetTicksPerFrame);
+    //robot.setSpeeds(leftPID.TargetTicksPerFrame, rightPID.TargetTicksPerFrame);
 }
 
-/* A subscriber for the /cmd_vel topic */
-ros::Subscriber<geometry_msgs::Twist> cmdVelSub("/hase/cmd_vel", &cmdVelCb);
+// A subscriber for the /cmd_vel topic
+ros::Subscriber<geometry_msgs::Twist> cmdVelSub("cmd_vel", &cmdVelCb);
 
-/* Calculate the odometry update and publish the result */
-void updateOdometry() {
-  double dt, dleft, dright, dx, dy, dxy_ave, dth, vxy, vth;
+// Calculate the twisr update and publish the result
+void updateTwist() {
+  //bt.printf("%d\r", robot.getRPM(Hase::LEFT_WHEEL));
 
-  /* Get the time in seconds since the last encoder measurement */
-  //dt = nh.now().toSec() - odomInfo.lastOdom.toSec();
-  dt = (odomInfo.encoderTime - odomInfo.lastEncoderTime) / 1000.0;
+  double vleft, vright, vxy, vth;
 
-  /* Save the encoder time for the next calculation */
-  odomInfo.lastEncoderTime = odomInfo.encoderTime;
+  vleft = robot.getWheelSpeed(Hase::LEFT_WHEEL);
+  vright = robot.getWheelSpeed(Hase::RIGHT_WHEEL);
 
-  /* Calculate the distance in meters traveled by the two wheels */
-  dleft = (leftPID.Encoder - odomInfo.prevLeftEnc) / robot.ticksPerMeter;
-  dright = (rightPID.Encoder - odomInfo.prevRightEnc) / robot.ticksPerMeter;
+  // Linear velocity
+  vxy = (vright + vleft) / 2.0;
 
-  odomInfo.prevLeftEnc = leftPID.Encoder;
-  odomInfo.prevRightEnc = rightPID.Encoder;
+  // Angular velocity
+  vth = (vright - vleft) / robot.wheelTrack;
 
-  /* Compute the average linear distance over the two wheels */
-  dxy_ave = (dleft + dright) / 2.0;
+  // Publish the speeds on the twist topic. Set the timestamp to the last encoder time.
+  twist_msg.header.frame_id = baseFrame;
+  twist_msg.header.stamp = nh.now();
+  twist_msg.twist.linear.x = vxy;
+  twist_msg.twist.linear.y = 0;
+  twist_msg.twist.linear.z = 0;
+  twist_msg.twist.angular.x = 0;
+  twist_msg.twist.angular.y = 0;
+  twist_msg.twist.angular.z = vth;
 
-  /* Compute the angle rotated */
-  dth = (dright - dleft) / robot.wheelTrack;
-
-  /* Linear velocity */
-  vxy = dxy_ave / dt;
-
-  /* Angular velocity */
-  vth = dth / dt;
-
-  /* How far did we move forward? */
-  if (dxy_ave != 0) {
-    dx = cos(dth) * dxy_ave;
-    dy = -sin(dth) * dxy_ave;
-    /* The total distance traveled so far */
-    odomInfo.linearX += (cos(odomInfo.angularZ) * dx - sin(
-    odomInfo.angularZ) * dy);
-    odomInfo.linearY += (sin(odomInfo.angularZ) * dx + cos(
-    odomInfo.angularZ) * dy);
-  }
-
-  /* The total angular rotated so far */
-  if (dth != 0)
-    odomInfo.angularZ += dth;
-
-  /* Represent the rotation as a quaternion */
-  geometry_msgs::Quaternion quaternion;
-  quaternion.x = 0.0;
-  quaternion.y = 0.0;
-  quaternion.z = sin(odomInfo.angularZ / 2.0);
-  quaternion.w = cos(odomInfo.angularZ / 2.0);
-
-  /* Publish the distances and speeds on the odom topic. Set the timestamp
-   > to the last encoder time. */
-  odom_msg.header.frame_id = odomFrame;
-  odom_msg.child_frame_id = baseFrame;
-  odom_msg.header.stamp = odomInfo.encoderStamp;
-  odom_msg.pose.position.x = odomInfo.linearX;
-  odom_msg.pose.position.y = odomInfo.linearY;
-  odom_msg.pose.position.z = 0;
-  odom_msg.pose.orientation = quaternion;
-  odom_msg.twist.linear.x = vxy;
-  odom_msg.twist.linear.y = 0;
-  odom_msg.twist.linear.z = 0;
-  odom_msg.twist.angular.x = 0;
-  odom_msg.twist.angular.y = 0;
-  odom_msg.twist.angular.z = vth;
-
-  odomPub.publish(&odom_msg);
+  twistPub.publish(&twist_msg);
 }
-
-Ticker updateOdom;
 
 int main() {
     // Init serial
     pc.baud(57600); // Interface with the BBB
     bt.baud(115200); // Interface with Remote Controller
-    //nh.initNode();
-    //nh.subscribe(cmdVelSub);
-    //nh.advertise(odomPub);
-    //updateOdom.attach(&updateOdometry, 1.0);
+    nh.initNode();
+    nh.subscribe(cmdVelSub);
+    nh.advertise(twistPub);
+    led.attach(&ledInt, 0.5);
+    twist.attach(&updateTwist, 0.1);
 
-    for (;;)
+    while (1)
     {
-    robot.setSpeeds(1.0, 1.0);
+        //robot.setSpeeds(1.0, 1.0);
 
-/*        if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
+        /*
+        if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
             robot.setSpeeds(0, 0);
             moving = 0;
         }
-*/
-        //nh.spinOnce();
-        //wait(0.001);
-        wait(0.10);
+        */
+
+        nh.spinOnce();
+        wait(0.001);
     }
 }
