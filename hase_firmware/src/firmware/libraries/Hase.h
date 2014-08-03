@@ -119,8 +119,8 @@ public:
      * @param wheel The wheel to obtain the pulses per revolution from
      * @return The specified wheel's pulses per revolution
      */
-    int getPulsesPerRevolution(Wheel wheel);
-    int getPulsesPerRevolution(Motors motor);
+    int getPulsesPerSecond(Wheel wheel);
+    int getPulsesPerSecond(Motors motor);
 
     /** Get the pulses per revolution of from a wheel
      *
@@ -129,6 +129,13 @@ public:
      */
     int getRPM(Wheel wheel);
     int getRPM(Motors motor);
+
+    /** Get the wheel's linear speed in meters per second
+     *
+     * @param wheel The wheel to obtain the speed from
+     * @return The specified wheel's speed (linear)
+     */
+    double getWheelSpeed(Wheel wheel);
 
     /** Get the count of revolutions for the specified wheel of the robot
      *

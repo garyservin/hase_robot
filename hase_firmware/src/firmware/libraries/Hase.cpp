@@ -8,6 +8,7 @@ Hase::Hase():
     _lpid(Kc1, Ti1, Td1, PID_INTERVAL),
     _rpid(Kc1, Ti1, Td1, PID_INTERVAL)
 {
+
     _lpid.setInputLimits(-10500.0, 10500.0);
     _lpid.setOutputLimits(-1.0, 1.0);
     _lpid.setBias(0.0);
@@ -75,7 +76,15 @@ int Hase::getCurrentState(Wheel wheel){
     }
 }
 
-int Hase::getPulsesPerRevolution(Wheel wheel){
+double Hase::getWheelSpeed(Wheel wheel){
+    if(wheel == LEFT_WHEEL){
+        return _lpps / ticksPerMeter;
+    }else{
+        return _rpps / ticksPerMeter;
+    }
+}
+
+int Hase::getPulsesPerSecond(Wheel wheel){
     if(wheel == LEFT_WHEEL){
         return _lpps / gearRatio;
     }else{
@@ -83,7 +92,7 @@ int Hase::getPulsesPerRevolution(Wheel wheel){
     }
 }
 
-int Hase::getPulsesPerRevolution(Motors motor){
+int Hase::getPulsesPerSecond(Motors motor){
     if(motor == LEFT_MOTOR){
         return _lpps;
     }else{
@@ -120,7 +129,8 @@ void Hase::readEncoder() {
     _lpps = _lqei.getPulses();
     _lqei.reset();
     _lpulses += _lpps;
-    _lpps *= 10;
+    // Calculate speed in pulses per second
+    _lpps *= ODOM_RATE;
 
     _lpid.setProcessValue(_lpps);
     float ltmp = _lpid.compute();
@@ -129,14 +139,15 @@ void Hase::readEncoder() {
     _rpps = _rqei.getPulses();
     _rqei.reset();
     _rpulses += _rpps;
-    _rpps *= 10;
+    // Calculate speed in pulses per second
+    _rpps *= ODOM_RATE;
 
     _rpid.setProcessValue(_rpps);
     float rtmp = _rpid.compute();
     _rmotor.speed(rtmp);
 
 #ifdef DEBUG
-    printf("%i\t%.2f\t|\t%i\t%.2f\r\n", _lpps, ltmp, _rpps, rtmp);
+    printf("%i\t%i\t%.2f\t|\t%i\t%i\t%.2f\r\n", _lpulses, _lpps, ltmp, _rpulses, _rpps, rtmp);
 #endif
 }
 
