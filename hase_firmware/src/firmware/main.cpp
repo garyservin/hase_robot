@@ -46,9 +46,6 @@ void cmdVelCb(const geometry_msgs::Twist& msg){
 
     robot.debug("Linear=%.2f, Angular=%.2f", x, th);
 
-    // Reset the auto stop timer
-    //lastMotorCommand = millis();
-
     if (x == 0 && th == 0) {
         robot.setSpeeds(0, 0);
         return;
@@ -122,12 +119,6 @@ int main() {
     robot.setSpeeds(0.0, 0.0);
     while (1)
     {
-        /*
-        if ((millis() - lastMotorCommand) > AUTO_STOP_INTERVAL) {
-            robot.setSpeeds(0, 0);
-        }
-        */
-
         nh.spinOnce();
         wait(0.01);
     }

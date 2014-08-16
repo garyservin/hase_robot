@@ -29,6 +29,7 @@ Hase::Hase():
     _rmotor.speed(0.0);
 
     _readEncoderTicker.attach(this, &Hase::readEncoder, PID_INTERVAL);
+    _lastMotorCommand.start();
 }
 
 // @params lspeed: speed in ticks per second
@@ -44,6 +45,9 @@ void Hase::setSpeedsTicks(float lspeed, float rspeed)
     _rpid.setSetPoint(rspeed);
     _rpid.setProcessValue(_rpps);
     _rmotor.speed(_rpid.compute());
+
+    // Reset motor timeout timer
+    _lastMotorCommand.reset();
 }
 
 // @params lspeed: speed in meters per second
@@ -52,7 +56,9 @@ void Hase::setSpeeds(float lspeed, float rspeed)
 {
     double vl = Hase::speedToTicks(lspeed);
     double vr = Hase::speedToTicks(rspeed);
+#ifdef DEBUG_ENABLED
     Hase::debug("setSpeeds(m->ticks): %.2f->%.2f, %.2f->%.2f", lspeed, vl, rspeed, vr);
+#endif
     Hase::setSpeedsTicks(vl, vr);
 }
 
@@ -156,11 +162,16 @@ void Hase::readEncoder() {
     float rtmp = _rpid.compute();
     _rmotor.speed(rtmp);
 
-#ifdef DEBUG_SERIAL
+#ifdef DEBUG_ENABLED
     Hase::debug("%i\t%.2f\t\t|\t%i\t%.2f\t", _lpulses, Hase::ticksToSpeed(_lpps), _rpulses, Hase::ticksToSpeed(_rpps));
-    Hase::debug("%i\t%i\t\t|\t%i\t%i\t", _lpulses, _lpps, _rpulses, _rpps);
-    Hase::debug("%i, %i", _lpulses, _rpps);
+    //Hase::debug("%i\t%i\t\t|\t%i\t%i\t", _lpulses, _lpps, _rpulses, _rpps);
+    //Hase::debug("%i, %i", _lpulses, _rpps);
 #endif
+
+    // Motor timeout
+    if(_lastMotorCommand >= AUTO_STOP_INTERVAL){
+        Hase::setSpeedsTicks(0, 0);
+    }
 }
 
 /* Convert meters per second to ticks per second */
