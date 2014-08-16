@@ -26,6 +26,7 @@ endif
 
 ifdef LPC_RESET
 reset:
+	@echo Resetting target.
 	$(LPC_RESET)
 endif
 

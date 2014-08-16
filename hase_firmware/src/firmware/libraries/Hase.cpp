@@ -1,6 +1,8 @@
 #include "Hase.h"
+#include <stdarg.h>
 
 Hase::Hase():
+    _debug(DBG_TX, DBG_RX),
     _lmotor(PWM_L, FWD_L, REV_L),
     _rmotor(PWM_R, FWD_R, REV_R),
     _lqei(QEIA_L, QEIB_L, NC, cprEncoder, QEI::X4_ENCODING),
@@ -8,6 +10,8 @@ Hase::Hase():
     _lpid(Kc1, Ti1, Td1, PID_INTERVAL),
     _rpid(Kc1, Ti1, Td1, PID_INTERVAL)
 {
+
+    _debug.baud(DEBUG_BAUDRATE);
 
     _lpid.setInputLimits(-10500.0, 10500.0);
     _lpid.setOutputLimits(-1.0, 1.0);
@@ -24,39 +28,47 @@ Hase::Hase():
     _lmotor.speed(0.0);
     _rmotor.speed(0.0);
 
-    _readEncoderTicker.attach(this, &Hase::readEncoder, ODOM_INTERVAL);
+    _readEncoderTicker.attach(this, &Hase::readEncoder, PID_INTERVAL);
 }
 
 // @params lspeed: speed in ticks per second
 // @params rspeed: speed in ticks per second
-void Hase::setSpeeds(float lspeed, float rspeed)
+void Hase::setSpeedsTicks(float lspeed, float rspeed)
 {
     _lpid.reset();
     _lpid.setSetPoint(lspeed);
-    _lmotor.speed(lspeed / 10500.0);
+    _lpid.setProcessValue(_lpps);
+    _lmotor.speed(_lpid.compute());
 
     _rpid.reset();
-    _rpid.setSetPoint(rspeed / 10500.0);
-    _rmotor.speed(rspeed);
-
-#ifdef DEBUG
-//    printf("Set point to L: %.2f\tR: %.2f\r\n", lspeed * 10500, rspeed * 10500);
-#endif
+    _rpid.setSetPoint(rspeed);
+    _rpid.setProcessValue(_rpps);
+    _rmotor.speed(_rpid.compute());
 }
 
-long Hase::getPulses(Wheel wheel){
+// @params lspeed: speed in meters per second
+// @params rspeed: speed in meters per second
+void Hase::setSpeeds(float lspeed, float rspeed)
+{
+    double vl = Hase::speedToTicks(lspeed);
+    double vr = Hase::speedToTicks(rspeed);
+    Hase::debug("setSpeeds(m->ticks): %.2f->%.2f, %.2f->%.2f", lspeed, vl, rspeed, vr);
+    Hase::setSpeedsTicks(vl, vr);
+}
+
+int Hase::getPulses(Wheel wheel){
     if(wheel == LEFT_WHEEL){
-        return _lpulses / gearRatio;
+        return _lqei.getPulses() / gearRatio;
     }else{
-        return _rpulses / gearRatio;
+        return _rqei.getPulses() / gearRatio;
     }
 }
 
-long Hase::getPulses(Motors motor){
+int Hase::getPulses(Motors motor){
     if(motor == LEFT_MOTOR){
-        return _lpulses;
+        return _lqei.getPulses();
     }else{
-        return _rpulses;
+        return _rqei.getPulses();
     }
 }
 
@@ -126,33 +138,48 @@ int Hase::getRPM(Motors motor){
 
 // Harcoded access to te qei interface
 void Hase::readEncoder() {
-    _lpps = _lqei.getPulses();
-    _lqei.reset();
-    _lpulses += _lpps;
-    // Calculate speed in pulses per second
-    _lpps *= ODOM_RATE;
+    int currentPulses = 0;
+
+    currentPulses = _lqei.getPulses();
+    _lpps = (currentPulses - _lpulses) * PID_RATE;
+    _lpulses = currentPulses;
 
     _lpid.setProcessValue(_lpps);
     float ltmp = _lpid.compute();
     _lmotor.speed(ltmp);
 
-    _rpps = _rqei.getPulses();
-    _rqei.reset();
-    _rpulses += _rpps;
-    // Calculate speed in pulses per second
-    _rpps *= ODOM_RATE;
+    currentPulses = _rqei.getPulses();
+    _rpps = (currentPulses - _rpulses) * PID_RATE;
+    _rpulses = currentPulses;
 
     _rpid.setProcessValue(_rpps);
     float rtmp = _rpid.compute();
     _rmotor.speed(rtmp);
 
-#ifdef DEBUG
-    printf("%i\t%i\t%.2f\t|\t%i\t%i\t%.2f\r\n", _lpulses, _lpps, ltmp, _rpulses, _rpps, rtmp);
+#ifdef DEBUG_SERIAL
+    Hase::debug("%i\t%.2f\t\t|\t%i\t%.2f\t", _lpulses, Hase::ticksToSpeed(_lpps), _rpulses, Hase::ticksToSpeed(_rpps));
+    Hase::debug("%i\t%i\t\t|\t%i\t%i\t", _lpulses, _lpps, _rpulses, _rpps);
+    Hase::debug("%i, %i", _lpulses, _rpps);
 #endif
 }
 
-/* Convert meters per second to ticks per time frame */
+/* Convert meters per second to ticks per second */
 int Hase::speedToTicks(float v) {
-  return int(v * ticksPerMeter * ODOM_INTERVAL);
+  return int(v * ticksPerMeter);// * ODOM_INTERVAL);
 }
 
+/* Convert ticks per second to meters per second */
+float Hase::ticksToSpeed(int ticks) {
+  return ticks / ticksPerMeter;
+}
+
+// Debug method
+int Hase::debug(const char *fmt, ...){
+    char buffer[200]= {0};
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, 200, fmt, args);
+    va_end(args);
+
+    return _debug.printf("[DEBUG] %s\r\n", buffer);
+}

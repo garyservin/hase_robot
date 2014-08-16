@@ -24,6 +24,20 @@
 #define QEIA_R  p12
 #define QEIB_R  p13
 
+#define DEBUG_ENABLE
+#define DEBUG_XBEE
+
+// Serial debug interface
+#ifdef DEBUG_XBEE
+#define DBG_TX   p28
+#define DBG_RX   p27
+#define DEBUG_BAUDRATE    115200
+#else
+#define DBG_TX   USBTX
+#define DBG_RX   USBRX
+#define DEBUG_BAUDRATE    57600
+#endif
+
 class Hase {
 public:
     /* Rate at which encoders are sampled and PID loop is updated */
@@ -44,10 +58,10 @@ public:
     /* Define the robot paramters */
     int cprEncoder = 64; // Encoder ticks per revolution for motor
     int gearRatio = 30; // Gear ratio for motor gear
-    int cpr = cprEncoder * gearRatio; // Encoder ticks per revolution for the Pololu 29:1 motor
+    int cpr = cprEncoder * gearRatio; // Encoder ticks per revolution for the Pololu 30:1 motor (1920)
     float wheelDiameter = 0.123825; // meters
     float wheelTrack = 0.23; // meters
-    float ticksPerMeter = cpr / (3.141592 * wheelDiameter);
+    float ticksPerMeter = cpr / (3.141592 * wheelDiameter); // ~4935.635851
 
     /* Stop the robot if it hasn't received a movement command
        in this number of milliseconds */
@@ -101,8 +115,15 @@ public:
 
     /** Set the speed of each wheel of the robot
      *
-     * @param lspeed The speed of the left wheel as a normalised value between -1.0 and 1.0
-     * @param rspeed The speed of the right wheel as a normalised value between -1.0 and 1.0
+     * @param lspeed The speed of the left wheel in ticks per second
+     * @param rspeed The speed of the right wheel in ticks per second
+     */
+    void setSpeedsTicks(float lspeed, float rspeed);
+
+    /** Set the speed of each wheel of the robot
+     *
+     * @param lspeed The speed of the left wheel in meters per second
+     * @param rspeed The speed of the right wheel in meters per second
      */
     void setSpeeds(float lspeed, float rspeed);
 
@@ -111,8 +132,8 @@ public:
      * @param wheel The wheel to obtain the pulses from
      * @return The specified wheel's encoder pulses
      */
-    long getPulses(Wheel wheel);
-    long getPulses(Motors motor);
+    int getPulses(Wheel wheel);
+    int getPulses(Motors motor);
 
     /** Get the pulses per revolution of the specified wheel of the robot
      *
@@ -151,7 +172,17 @@ public:
      */
     int speedToTicks(float);
 
+    /** Convert ticks per second to meter per seconds
+     *
+     * @param int ticks per second to convert
+     * @return The converted speed in meters per second
+     */
+    float ticksToSpeed(int ticks);
+
+    int debug(const char *fmt, ...);
+
 private:
+    Serial _debug;
     Motor _lmotor;
     Motor _rmotor;
     QEI _lqei;
@@ -161,8 +192,8 @@ private:
 
     Ticker _readEncoderTicker;
 
-    long _lpulses;
-    long _rpulses;
+    int _lpulses;
+    int _rpulses;
 
     int _lpps;
     int _rpps;
@@ -183,6 +214,7 @@ private:
      * @return The specified wheel's current state
      */
     int getCurrentState(Wheel wheel);
+
 };
 
 #endif
