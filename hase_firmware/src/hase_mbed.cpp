@@ -1,4 +1,4 @@
-#include <hase_mbed.hpp>
+#include <hase_firmware/hase_mbed.hpp>
 
 namespace hase
 {

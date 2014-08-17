@@ -23,6 +23,8 @@ generate_messages(
 )
 
 catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES hase_mbed
   CATKIN_DEPENDS
   geometry_msgs
   sensor_msgs
@@ -51,4 +53,8 @@ target_link_libraries(add_covariances
 
 install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
