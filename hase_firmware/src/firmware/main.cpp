@@ -39,7 +39,7 @@ hase_firmware::ImuLite imu_msg;
 ros::Publisher pub_imu("/hase/imu_lite", &imu_msg);
 
 // A subscriber for the /cmd_vel topic
-ros::Subscriber<geometry_msgs::Twist> cmdVelSub("cmd_vel", &cmdVelCb);
+ros::Subscriber<geometry_msgs::Twist> cmdVelSub("/hase/cmd_vel", &cmdVelCb);
 
 void cmdVelCb(const geometry_msgs::Twist& msg){
     float x = msg.linear.x; // m/s
