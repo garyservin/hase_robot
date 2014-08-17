@@ -8,7 +8,9 @@ Hase::Hase():
     _lqei(QEIA_L, QEIB_L, NC, cprEncoder, QEI::X4_ENCODING),
     _rqei(QEIA_R, QEIB_R, NC, cprEncoder, QEI::X4_ENCODING),
     _lpid(Kc1, Ti1, Td1, PID_INTERVAL),
-    _rpid(Kc1, Ti1, Td1, PID_INTERVAL)
+    _rpid(Kc1, Ti1, Td1, PID_INTERVAL),
+    _gyroYaw(GYR_YAW),
+    _sysLed(SYSLED)
 {
 
     _debug.baud(DEBUG_BAUDRATE);
@@ -28,7 +30,11 @@ Hase::Hase():
     _lmotor.speed(0.0);
     _rmotor.speed(0.0);
 
+    wait(0.2);
+    calibrateImu();
+
     _readEncoderTicker.attach(this, &Hase::readEncoder, PID_INTERVAL);
+    _sysLedTicker.attach(this, &Hase::sysBlink, SYSLED_INTERVAL);
     _lastMotorCommand.start();
 }
 
@@ -163,7 +169,7 @@ void Hase::readEncoder() {
     _rmotor.speed(rtmp);
 
 #ifdef DEBUG_ENABLED
-    Hase::debug("%i\t%.2f\t\t|\t%i\t%.2f\t", _lpulses, Hase::ticksToSpeed(_lpps), _rpulses, Hase::ticksToSpeed(_rpps));
+    //Hase::debug("%i\t%.2f\t\t|\t%i\t%.2f\t", _lpulses, Hase::ticksToSpeed(_lpps), _rpulses, Hase::ticksToSpeed(_rpps));
     //Hase::debug("%i\t%i\t\t|\t%i\t%i\t", _lpulses, _lpps, _rpulses, _rpps);
     //Hase::debug("%i, %i", _lpulses, _rpps);
 #endif
@@ -182,6 +188,45 @@ int Hase::speedToTicks(float v) {
 /* Convert ticks per second to meters per second */
 float Hase::ticksToSpeed(int ticks) {
   return ticks / ticksPerMeter;
+}
+
+// IMU calibration
+void Hase::calibrateImu(void) {
+    float gyrz = 0.0;
+
+    for (int i = 0; i < 128; i++) {
+        gyrz += _gyroYaw.read();
+    }
+
+    gyrz_offset = gyrz / 128.0;
+
+#ifdef DEBUG_ENABLED
+    Hase::debug("offset(yaw): %.2f", gyrz_offset);
+#endif
+}
+
+// Return yaw speed in radians per second
+float Hase::getYawSpeed(){
+    float gyrz = 0.0;
+    _yaw_vel = 0;
+
+    for (int i = 0; i < 128; i++) {
+        gyrz += _gyroYaw.read();
+    }
+
+     gyrz /= 128.0;
+
+    _yaw_vel = (gyrz - gyrz_offset) * 3.3 / _GYRO_SCALE * _DEG2RAD;
+
+#ifdef DEBUG_ENABLED
+    //Hase::debug("gyro(yaw): %f,\t%f,\t%f", gyrz, gyrz_offset, _yaw_vel);
+#endif
+
+    return _yaw_vel;
+}
+
+void Hase::sysBlink(){
+    _sysLed = !_sysLed;
 }
 
 // Debug method

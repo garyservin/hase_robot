@@ -24,6 +24,12 @@
 #define QEIA_R  p12
 #define QEIB_R  p13
 
+// Gyro yaw axis
+#define GYR_YAW p17
+
+#define SYSLED LED1
+
+// DEBUG
 #define DEBUG_ENABLED
 #define DEBUG_XBEE
 
@@ -40,13 +46,13 @@
 
 class Hase {
 public:
-    /* Rate at which encoders are sampled and PID loop is updated */
+    // SYS led blinking rate
+    #define SYSLED_RATE        5     // Hz
+    const float SYSLED_INTERVAL = 1.0 / SYSLED_RATE;
+
+    // Rate at which encoders are sampled and PID loop is updated
     #define PID_RATE        30     // Hz
     const float PID_INTERVAL = 1.0 / PID_RATE;
-
-    /* Odometry publishing rate */
-    #define ODOM_RATE       10     // Hz
-    const float ODOM_INTERVAL = 1.0 / ODOM_RATE;
 
     // PID Parameters
     float Kc1 = 1.6;
@@ -77,6 +83,11 @@ public:
         RIGHT_MOTOR
 
     } Motors;
+
+    #define _DEG2RAD 0.01745331111
+    #define _GYRO_SCALE 0.0005 // Gyroscope scale is 0.5 mV/dps (1x OUT)
+
+    float gyrz_offset = 0.372727;
 
     /** Create a hase control interface
      */
@@ -148,6 +159,13 @@ public:
      */
     float ticksToSpeed(int ticks);
 
+    /** Get the yaw angular velocity in radians per second
+     *
+     * @param wheel The wheel to obtain the speed from
+     * @return The specified wheel's speed (linear)
+     */
+    float getYawSpeed();
+
     int debug(const char *fmt, ...);
 
 private:
@@ -158,8 +176,11 @@ private:
     QEI _rqei;
     PID _lpid;
     PID _rpid;
+    AnalogIn _gyroYaw;
+    DigitalOut _sysLed;
 
     Ticker _readEncoderTicker;
+    Ticker _sysLedTicker;
     Timer _lastMotorCommand;
 
     int _lpulses;
@@ -167,6 +188,9 @@ private:
 
     int _lpps;
     int _rpps;
+
+    // Yaw rotation speed in milivolts
+    float _yaw_vel;
 
     /** Callback executed via the Ticker to read encoder satus
      */
@@ -184,6 +208,14 @@ private:
      * @return The specified wheel's current state
      */
     int getCurrentState(Wheel wheel);
+
+    /** Calibrates the imu
+     */
+    void calibrateImu();
+
+    /** Led blink callback
+     */
+    void sysBlink();
 
 };
 

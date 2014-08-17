@@ -4,14 +4,20 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <ImuLite.h>
 
+// Rate at which gyroscope is sampled
+#define IMU_RATE       10     // Hz
+const float IMU_INTERVAL = 1.0 / IMU_RATE;
+
+// Rate at which velocities are sampled
+#define TWIST_RATE       10     // Hz
+const float TWIST_INTERVAL = 1.0 / TWIST_RATE;
+
 // LEDs
-DigitalOut led1 ( LED1 );
 DigitalOut led2 ( LED2 );
 DigitalOut led3 ( LED3 );
 DigitalOut led4 ( LED4 );
 
 Hase robot;
-Ticker led;
 Ticker twist;
 Ticker imu;
 
@@ -34,10 +40,6 @@ ros::Publisher pub_imu("/hase/imu_lite", &imu_msg);
 
 // A subscriber for the /cmd_vel topic
 ros::Subscriber<geometry_msgs::Twist> cmdVelSub("cmd_vel", &cmdVelCb);
-
-void ledInt(){
-    led1 = !led1;
-}
 
 void cmdVelCb(const geometry_msgs::Twist& msg){
     float x = msg.linear.x; // m/s
@@ -102,7 +104,7 @@ void sendImu(){
     imu_msg.header.frame_id =  baseFrame;
     imu_msg.header.stamp = nh.now();
 
-    // Add orientation, linear and anular velocities
+    imu_msg.angular_velocity.z = robot.getYawSpeed();
 
     pub_imu.publish(&imu_msg);
 }
@@ -112,9 +114,8 @@ int main() {
     nh.advertise(pub_twist);
     nh.advertise(pub_imu);
     nh.subscribe(cmdVelSub);
-    twist.attach(&sendTwist, 0.1);
-    imu.attach(&sendImu, 0.1);
-    led.attach(&ledInt, 0.5);
+    twist.attach(&sendTwist, TWIST_INTERVAL);
+    imu.attach(&sendImu, IMU_INTERVAL);
 
     robot.setSpeeds(0.0, 0.0);
     while (1)
