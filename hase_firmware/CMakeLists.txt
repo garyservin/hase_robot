@@ -33,7 +33,14 @@ catkin_package(
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
+)
+
+add_library(hase_mbed src/hase_mbed.cpp)
+target_link_libraries(hase_mbed ${catkin_LIBRARIES})
+install(TARGETS hase_mbed
+        DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 add_executable(add_covariances src/helper/add_covariances.cpp)
