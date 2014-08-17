@@ -15,7 +15,7 @@ void HaseRos::subscribeVelocityCommand(const geometry_msgs::TwistConstPtr msg)
         double epsilon = std::numeric_limits<double>::epsilon();
         double linear_speed = msg->linear.x; // m/s
         double angular_speed = msg->angular.z; // rad/s
-        ROS_INFO("Velocity received: %.2f %.2f", linear_speed, angular_speed);
+        ROS_DEBUG("Velocity received: %.2f %.2f", linear_speed, angular_speed);
 
     if(usebbb_){
         if( linear_speed <  epsilon && linear_speed > -epsilon ) {
