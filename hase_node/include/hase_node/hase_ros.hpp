@@ -7,6 +7,7 @@
 #include <std_msgs/String.h>
 #include <geometry_msgs/Twist.h>
 #include <hase_driver/hase.hpp>
+#include <hase_firmware/hase_mbed.hpp>
 
 namespace hase
 {
@@ -22,13 +23,17 @@ private:
    ** Variables
    **********************/
   std::string name; // name of the ROS node
+  #ifdef USE_BBB
   Hase hase;
+  #endif
+  HaseMbed hase_mbed;
   bool cmd_vel_timed_out_; // stops warning spam when cmd_vel flags as timed out more than once in a row
-
+  bool usebbb_; // If we're using the Beaglebone Black
   /*********************
    ** Ros Comms
    **********************/
   ros::Publisher version_info_publisher;
+  ros::Publisher twist_mbed_publisher;
 
   ros::Subscriber velocity_command_subscriber;
 

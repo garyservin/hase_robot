@@ -6,12 +6,13 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   std_msgs
   hase_driver
+  hase_firmware
 )
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES hase_ros
-  CATKIN_DEPENDS geometry_msgs std_msgs hase_driver
+  CATKIN_DEPENDS geometry_msgs std_msgs hase_driver hase_firmware
 )
 
 include_directories(
