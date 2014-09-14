@@ -46,19 +46,15 @@ void cmdVelCb(const geometry_msgs::Twist& msg){
     float th = msg.angular.z; // rad/s
     float spd_left, spd_right;
 
-    robot.debug("Linear=%.2f, Angular=%.2f", x, th);
-
-    if (x == 0 && th == 0) {
-        robot.setSpeeds(0, 0);
-        return;
+    if (x == 0.0 && th == 0.0) {
+        spd_left = spd_right = 0.0;
     }
-
-    if (x == 0) {
+    else if (x == 0.0) {
         // Turn in place
         spd_right = th * robot.wheelTrack / 2.0;
         spd_left = -spd_right;
     }
-    else if (th == 0) {
+    else if (th == 0.0){
         // Pure forward/backward motion
         spd_left = spd_right = x;
     }
@@ -68,7 +64,8 @@ void cmdVelCb(const geometry_msgs::Twist& msg){
         spd_right = x + th * robot.wheelTrack / 2.0;
     }
 
-    robot.debug("Left=%.2f, Right=%.2f", spd_left, spd_right);
+    robot.info("Received cmd_vel: x=%.2f, th=%.2f", x, th);
+    robot.info("Wheel Speeds to: L=%.2f, R=%.2f", spd_left, spd_right);
 
     robot.setSpeeds(spd_left, spd_right);
 }
@@ -111,10 +108,12 @@ void sendImu(){
 
 int main() {
     nh.initNode();
-    nh.advertise(pub_twist);
-    nh.advertise(pub_imu);
     nh.subscribe(cmdVelSub);
+
+    nh.advertise(pub_twist);
     twist.attach(&sendTwist, TWIST_INTERVAL);
+
+    nh.advertise(pub_imu);
     imu.attach(&sendImu, IMU_INTERVAL);
 
     robot.setSpeeds(0.0, 0.0);
