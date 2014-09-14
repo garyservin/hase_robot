@@ -5,7 +5,6 @@
 #include <Motor.h>
 #include <QEI.h>
 #include <PID.h>
-#include <ros/time.h>
 
 // Motors
 // Right Motor
@@ -37,7 +36,7 @@
 #ifdef DEBUG_XBEE
 #define DBG_TX   p28
 #define DBG_RX   p27
-#define DEBUG_BAUDRATE    115200
+#define DEBUG_BAUDRATE    57600
 #else
 #define DBG_TX   USBTX
 #define DBG_RX   USBRX
@@ -167,6 +166,8 @@ public:
     float getYawSpeed();
 
     int debug(const char *fmt, ...);
+
+    int info(const char *fmt, ...);
 
 private:
     Serial _debug;

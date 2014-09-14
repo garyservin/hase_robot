@@ -42,12 +42,10 @@ Hase::Hase():
 // @params rspeed: speed in ticks per second
 void Hase::setSpeedsTicks(float lspeed, float rspeed)
 {
-    _lpid.reset();
     _lpid.setSetPoint(lspeed);
     _lpid.setProcessValue(_lpps);
     _lmotor.speed(_lpid.compute());
 
-    _rpid.reset();
     _rpid.setSetPoint(rspeed);
     _rpid.setProcessValue(_rpps);
     _rmotor.speed(_rpid.compute());
@@ -62,9 +60,7 @@ void Hase::setSpeeds(float lspeed, float rspeed)
 {
     double vl = Hase::speedToTicks(lspeed);
     double vr = Hase::speedToTicks(rspeed);
-#ifdef DEBUG_ENABLED
     Hase::debug("setSpeeds(m->ticks): %.2f->%.2f, %.2f->%.2f", lspeed, vl, rspeed, vr);
-#endif
     Hase::setSpeedsTicks(vl, vr);
 }
 
@@ -168,15 +164,14 @@ void Hase::readEncoder() {
     float rtmp = _rpid.compute();
     _rmotor.speed(rtmp);
 
-#ifdef DEBUG_ENABLED
     //Hase::debug("%i\t%.2f\t\t|\t%i\t%.2f\t", _lpulses, Hase::ticksToSpeed(_lpps), _rpulses, Hase::ticksToSpeed(_rpps));
     //Hase::debug("%i\t%i\t\t|\t%i\t%i\t", _lpulses, _lpps, _rpulses, _rpps);
     //Hase::debug("%i, %i", _lpulses, _rpps);
-#endif
 
     // Motor timeout
     if(_lastMotorCommand >= AUTO_STOP_INTERVAL){
         Hase::setSpeedsTicks(0, 0);
+        Hase::debug("Timeout");
     }
 }
 
@@ -200,9 +195,7 @@ void Hase::calibrateImu(void) {
 
     gyrz_offset = gyrz / 128.0;
 
-#ifdef DEBUG_ENABLED
     Hase::debug("offset(yaw): %.2f", gyrz_offset);
-#endif
 }
 
 // Return yaw speed in radians per second
@@ -218,9 +211,7 @@ float Hase::getYawSpeed(){
 
     _yaw_vel = (gyrz - gyrz_offset) * 3.3 / _GYRO_SCALE * _DEG2RAD;
 
-#ifdef DEBUG_ENABLED
-    //Hase::debug("gyro(yaw): %f,\t%f,\t%f", gyrz, gyrz_offset, _yaw_vel);
-#endif
+    Hase::debug("gyro(yaw): %f,\t%f,\t%f", gyrz, gyrz_offset, _yaw_vel);
 
     return _yaw_vel;
 }
@@ -237,5 +228,20 @@ int Hase::debug(const char *fmt, ...){
     vsnprintf(buffer, 200, fmt, args);
     va_end(args);
 
+#ifdef DEBUG_ENABLED
     return _debug.printf("[DEBUG] %s\r\n", buffer);
+#endif
+}
+
+// INFO method
+int Hase::info(const char *fmt, ...){
+    char buffer[200]= {0};
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, 200, fmt, args);
+    va_end(args);
+
+#ifdef DEBUG_ENABLED
+    return _debug.printf("[INFO] %s\r\n", buffer);
+#ifdef INFO_ENABLED
 }
