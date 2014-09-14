@@ -222,26 +222,28 @@ void Hase::sysBlink(){
 
 // Debug method
 int Hase::debug(const char *fmt, ...){
+#ifdef DEBUG_ENABLED
     char buffer[200]= {0};
     va_list args;
     va_start(args, fmt);
     vsnprintf(buffer, 200, fmt, args);
     va_end(args);
 
-#ifdef DEBUG_ENABLED
     return _debug.printf("[DEBUG] %s\r\n", buffer);
 #endif
+    return 0;
 }
 
 // INFO method
 int Hase::info(const char *fmt, ...){
+#ifdef INFO_ENABLED
     char buffer[200]= {0};
     va_list args;
     va_start(args, fmt);
     vsnprintf(buffer, 200, fmt, args);
     va_end(args);
 
-#ifdef DEBUG_ENABLED
     return _debug.printf("[INFO] %s\r\n", buffer);
-#ifdef INFO_ENABLED
+#endif
+    return 0;
 }

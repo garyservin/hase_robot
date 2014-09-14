@@ -29,7 +29,8 @@
 #define SYSLED LED1
 
 // DEBUG
-#define DEBUG_ENABLED
+//#define DEBUG_ENABLED
+#define INFO_ENABLED
 #define DEBUG_XBEE
 
 // Serial debug interface
