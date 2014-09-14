@@ -11,22 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-PROJECT=hase
-GCC4MBED_DIR=/home/gary/src/external/mbed/gcc4mbed
-GPFLAGS=-w
-INCDIRS=./libraries
-LIBS_PREFIX=
-LIBS_SUFFIX=
-
-ifdef LPC_UPLOAD
-UPLOAD_COMMAND = $(subst PROJECT,$(PROJECT),$(LPC_UPLOAD))
-upload:
-	$(UPLOAD_COMMAND)
-endif
+PROJECT         := haseROS
+DEVICES         := LPC1768
+GCC4MBED_DIR    := /home/gary/src/external/mbed/gcc4mbed
+INCDIRS         := libraries
+NO_FLOAT_SCANF  := 1
 
 ifdef LPC_RESET
 reset:
-	@echo Resetting target.
+	@echo "Resetting the target"
 	$(LPC_RESET)
 endif
 
