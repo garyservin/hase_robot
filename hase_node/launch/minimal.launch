@@ -3,8 +3,6 @@
   Standalone launcher for running a Hase Robot
  -->
 <launch>
-  <!--arg name="kobuki_publish_tf" default="true"/--> <!-- Publish base_footprint - odom transforms (usually good thing to have for localisation) -->
-
   <node pkg="hase_node" type="hase_node" name="hase_node" output="screen" clear_params="true" >
     <param name="usebbb" value="false"/>
   </node>
