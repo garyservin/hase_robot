@@ -23,4 +23,19 @@ reset:
 	$(LPC_RESET)
 endif
 
+ifdef LPC_RESET_BBB
+reset-bbb:
+	@echo "Resetting the Mbed remotely"
+	$(LPC_RESET_BBB)
+endif
+
+ifdef LPC_DEPLOY_BBB
+DEPLOY_COMMAND = $(subst PROJECT,$(DEVICES)/$(PROJECT),$(LPC_DEPLOY_BBB))
+deploy-bbb:
+	@echo "Deploying to target remotely and resetting"
+	$(DEPLOY_COMMAND)
+	@echo "Resetting the Mbed remotely"
+	$(LPC_RESET_BBB)
+endif
+
 include $(GCC4MBED_DIR)/build/gcc4mbed.mk
