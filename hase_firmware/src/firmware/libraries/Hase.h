@@ -68,7 +68,7 @@ public:
     float ticksPerMeter = cpr / (3.141592 * wheelDiameter); // ~4935.635851
 
     // Stop the robot if it hasn't received a movement command in this number of milliseconds
-    #define AUTO_STOP_INTERVAL 2.0
+    #define AUTO_STOP_INTERVAL 0.5
 
     typedef enum Wheel {
 
