@@ -1,0 +1,18 @@
+<package>
+  <name>hase_robot</name>
+  <version>0.0.0</version>
+  <description>Metapackage of software to install on Hase.</description>
+
+  <maintainer email="garyservin@gmail.com">Gary Servin</maintainer>
+  <author email="garyservin@gmail.com">Gary Servin</author>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>hase_base</run_depend>
+
+  <export>
+    <metapackage />
+  </export>
+</package>

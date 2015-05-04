@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-   <arg name="port" default="/dev/mbed" />
-
-   <node name="serial_node" pkg="rosserial_python" type="serial_node.py" args="$(arg port)" output="screen" />
-   <node name="add_covariances" pkg="hase_firmware" type="add_covariances" output="screen" />
-</launch>

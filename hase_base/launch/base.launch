@@ -1,0 +1,24 @@
+<launch>
+  <include file="$(find hase_description)/launch/description.launch" />
+
+  <node pkg="hase_base" type="hase_node" name="hase_node">
+    <rosparam>
+      port: /dev/mbed
+      require:
+        publishers:
+          - feedback
+        subscribers:
+          - cmd_drive
+    </rosparam>
+  </node>
+
+  <!-- TODO: Eliminate this by compiling the necessary message definitions into hase_base. -->
+  <node pkg="rosserial_python" type="message_info_service.py" name="rosserial_message_info" />
+
+  <!-- Differential controller and basic localization -->
+  <include file="$(find hase_control)/launch/control.launch" />
+
+  <!-- Teleoperation via joystick and rviz interactive markers -->
+  <include file="$(find hase_control)/launch/teleop.launch" />
+
+</launch>

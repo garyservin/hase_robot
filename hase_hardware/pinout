@@ -1,7 +1,0 @@
-H-BRIDGE    P8/P9   OFFSET  ADDRESS GPIO()      KERNEL GPIOX_Y -> (X*32)+Y  MODE
-R_FWD       P8_9    09c     89c     GPIO2_5     69                          0x07
-R_REV       P8_11   034     834     GPIO1_13    45                          0x07
-R_PWM       P8_13   024     824     GPIO0_23    23                          0x04 // PWM
-L_FWD       P8_15   03c     83c     GPIO1_15    47                          0x07
-L_REV       P8_17   02c     82c     GPIO0_27    27                          0x07
-L_PWM       P8_19   020     820     GPIO0_22    22                          0x04 // PWM
