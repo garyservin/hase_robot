@@ -29,6 +29,7 @@
   <run_depend>rosserial_server</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>topic_tools</run_depend>
+  <run_depend>sick_tim</run_depend>
 
   <export>
   </export>
