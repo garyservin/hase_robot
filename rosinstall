@@ -1,2 +1,2 @@
-- git: {local-name: hase_robot, uri: 'https://github.com/garyservin/hase_robot', version: master}
-- git: {local-name: hase, uri: 'https://github.com/garyservin/hase', version: master}
+- git: {local-name: hase_robot, uri: 'https://github.com/haserobot/hase_robot', version: master}
+- git: {local-name: hase, uri: 'https://github.com/haserobot/hase', version: master}
