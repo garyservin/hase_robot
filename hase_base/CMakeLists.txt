@@ -3,12 +3,12 @@ project(hase_base)
 
 find_package(catkin REQUIRED COMPONENTS
   controller_manager hardware_interface hase_msgs realtime_tools
-  roscpp roslaunch roslint rosserial_server std_msgs)
+  roscpp roslaunch roslint rosserial_server std_msgs sensor_msgs)
 
 find_package(Boost REQUIRED COMPONENTS thread chrono)
 
 catkin_package(
-  DEPENDS hase_msgs
+  CATKIN_DEPENDS hase_msgs sensor_msgs
 )
 
 include_directories(include ${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})

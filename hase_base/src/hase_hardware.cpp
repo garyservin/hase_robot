@@ -55,6 +55,9 @@ HaseHardware::HaseHardware()
 
   // Realtime publisher, initializes differently from regular ros::Publisher
   cmd_drive_pub_.init(nh_, "cmd_drive", 1);
+
+  imu_sub_ = nh_.subscribe("imu/data_hase", 1, &HaseHardware::imuCallback, this);
+  imu_raw_pub_.init(nh_, "imu/data_raw", 1);
 }
 
 /**
@@ -98,6 +101,43 @@ void HaseHardware::feedbackCallback(const hase_msgs::Feedback::ConstPtr& msg)
   // until the control thread is not using the lock.
   boost::mutex::scoped_lock lock(feedback_msg_mutex_);
   feedback_msg_ = msg;
+}
+
+void HaseHardware::imuCallback(const hase_msgs::Imu::ConstPtr& msg)
+{
+  // Update the feedback message pointer to point to the current message. Block
+  // until the control thread is not using the lock.
+  boost::mutex::scoped_lock lock(imu_msg_mutex_);
+
+  if (imu_raw_pub_.trylock())
+  {
+    // Fill header
+    imu_raw_pub_.msg_.header = msg->header;
+    imu_raw_pub_.msg_.header.frame_id = "imu";
+
+    // Fill quaternion orientation
+    imu_raw_pub_.msg_.orientation.x = 0.0;
+    imu_raw_pub_.msg_.orientation.y = 0.0;
+    imu_raw_pub_.msg_.orientation.z = 0.0;
+    imu_raw_pub_.msg_.orientation.w = 0.0;
+    imu_raw_pub_.msg_.orientation_covariance[0] = 0.0003;
+    imu_raw_pub_.msg_.orientation_covariance[4] = 0.0003;
+    imu_raw_pub_.msg_.orientation_covariance[8] = 0.0003;
+
+    // Fill angular velocities
+    imu_raw_pub_.msg_.angular_velocity = msg->angular_velocity;
+    imu_raw_pub_.msg_.angular_velocity_covariance[0] = 0.0003;
+    imu_raw_pub_.msg_.angular_velocity_covariance[4] = 0.0003;
+    imu_raw_pub_.msg_.angular_velocity_covariance[8] = 0.0003;
+
+    // Fill linear accelerations
+    imu_raw_pub_.msg_.linear_acceleration = msg->linear_acceleration;
+    imu_raw_pub_.msg_.linear_acceleration_covariance[0] = 0.0003;
+    imu_raw_pub_.msg_.linear_acceleration_covariance[4] = 0.0003;
+    imu_raw_pub_.msg_.linear_acceleration_covariance[8] = 0.0003;
+
+    imu_raw_pub_.unlockAndPublish();
+  }
 }
 
 }  // namespace hase_base

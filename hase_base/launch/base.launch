@@ -8,6 +8,7 @@
       require:
         publishers:
           - feedback
+          - imu/data_hase
         subscribers:
           - cmd_drive
     </rosparam>
@@ -16,31 +17,25 @@
   <!-- TODO: Eliminate this by compiling the necessary message definitions into hase_base. -->
   <node pkg="rosserial_python" type="message_info_service.py" name="rosserial_message_info" />
 
+  <!-- Filter raw gyro data into a usable IMU message -->
+  <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter">
+    <rosparam>
+      gain: 0.1
+      zeta: 0.001
+      publish_tf: false
+      use_mag: false
+    </rosparam>
+  </node>
+
   <!-- Differential controller and basic localization -->
   <include file="$(find hase_control)/launch/control.launch" />
 
   <!-- Teleoperation via joystick and rviz interactive markers -->
-  <!--include file="$(find hase_control)/launch/teleop.launch" /-->
+  <include file="$(find hase_control)/launch/teleop.launch" />
 
   <!-- Sick Tim571 Lidar-->
   <node name="sick_tim571_2050101" pkg="sick_tim" type="sick_tim551_2050001" respawn="false">
-    <!-- default values: -->
-    <!--
-      <param name="min_ang" type="double" value="-2.35619449019" />
-      <param name="max_ang" type="double" value="2.35619449019" />
-      <param name="intensity" type="bool" value="True" />
-      <param name="skip" type="int" value="0" />
-      <param name="frame_id" type="str" value="laser" />
-      <param name="time_offset" type="double" value="-0.001" />
-      <param name="publish_datagram" type="bool" value="False" />
-      <param name="subscribe_datagram" type="bool" value="false" />
-      <param name="range_min" type="double" value="0.05" />
-    -->
     <param name="range_max" type="double" value="25.0" />
-
-    <!-- Older versions of the scanner firmware report an incorrect time_increment.
-         If you get a warning about time_increment, uncomment this. -->
-    <!-- <param name="time_increment" type="double" value="0.000061722" /> -->
   </node>
 
   <node name="laser_frame" pkg="tf" type="static_transform_publisher" args="0.206 0 0.16 0 0 0 1 base_link laser 100" />

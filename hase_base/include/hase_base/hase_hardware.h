@@ -37,6 +37,8 @@
 #include "hardware_interface/robot_hw.h"
 #include "hase_msgs/Drive.h"
 #include "hase_msgs/Feedback.h"
+#include "hase_msgs/Imu.h"
+#include "sensor_msgs/Imu.h"
 #include "realtime_tools/realtime_publisher.h"
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
@@ -54,10 +56,13 @@ public:
 
 private:
   void feedbackCallback(const hase_msgs::Feedback::ConstPtr& msg);
+  void imuCallback(const hase_msgs::Imu::ConstPtr& msg);
 
   ros::NodeHandle nh_;
   ros::Subscriber feedback_sub_;
+  ros::Subscriber imu_sub_;
   realtime_tools::RealtimePublisher<hase_msgs::Drive> cmd_drive_pub_;
+  realtime_tools::RealtimePublisher<sensor_msgs::Imu> imu_raw_pub_;
 
   hardware_interface::JointStateInterface joint_state_interface_;
   hardware_interface::VelocityJointInterface velocity_joint_interface_;
@@ -79,6 +84,8 @@ private:
   // This pointer is set from the ROS thread.
   hase_msgs::Feedback::ConstPtr feedback_msg_;
   boost::mutex feedback_msg_mutex_;
+  hase_msgs::Imu::ConstPtr imu_msg_;
+  boost::mutex imu_msg_mutex_;
 };
 
 }  // namespace hase_base
